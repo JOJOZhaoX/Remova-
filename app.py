@@ -4,20 +4,18 @@ import json
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-
 
 ROOT = Path(__file__).parent
 DB_PATH = ROOT / "remevahe.db"
 
-
 HTML = """<!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Remevahe｜存真</title>
+  <title>Remevahe</title>
   <style>
     :root { color-scheme: light; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
     body { margin:0; background:#f5f4f0; color:#252525; }
@@ -43,43 +41,42 @@ HTML = """<!doctype html>
 <body>
   <main>
     <header>
-      <div><h1>Remevahe <span style="font-weight:400">存真</span></h1><div class="tagline">存下此刻，留住真实。</div></div>
+      <div><h1>Remevahe</h1><div class="tagline">Capture the moment. Keep what is real.</div></div>
       <time id="today"></time>
     </header>
     <form id="note-form">
-      <textarea id="note" maxlength="1000" placeholder="此刻有什么值得留下？"></textarea>
-      <div class="form-footer"><span id="length">0 / 1000</span><button id="save" type="submit">存下这一刻</button></div>
+      <textarea id="note" maxlength="1000" placeholder="What is worth keeping from this moment?"></textarea>
+      <div class="form-footer"><span id="length">0 / 1000</span><button id="save" type="submit">Save this moment</button></div>
     </form>
     <section id="timeline"></section>
   </main>
   <script>
-    const note = document.querySelector('#note');
-    const timeline = document.querySelector('#timeline');
-    const length = document.querySelector('#length');
-    document.querySelector('#today').textContent = new Intl.DateTimeFormat('zh-CN',{month:'short',day:'numeric'}).format(new Date());
-    note.addEventListener('input', () => length.textContent = `${note.value.length} / 1000`);
-    function escapeHtml(value) { const div = document.createElement('div'); div.textContent = value; return div.innerHTML; }
-    function formatTime(value) { return new Date(value).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'}); }
+    const note = document.querySelector("#note");
+    const timeline = document.querySelector("#timeline");
+    const length = document.querySelector("#length");
+    document.querySelector("#today").textContent = new Intl.DateTimeFormat("en-US",{month:"short",day:"numeric"}).format(new Date());
+    note.addEventListener("input", () => length.textContent = `${note.value.length} / 1000`);
+    function escapeHtml(value) { const div = document.createElement("div"); div.textContent = value; return div.innerHTML; }
+    function formatTime(value) { return new Date(value).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}); }
     async function loadNotes() {
-      const response = await fetch('/api/notes');
+      const response = await fetch("/api/notes");
       const notes = await response.json();
-      if (!notes.length) { timeline.innerHTML = '<div class="empty">还没有记录。留下今天的第一刻吧。</div>'; return; }
-      timeline.innerHTML = `<div class="count">今天的记录 · ${notes.length}</div>` + notes.map(item =>
+      if (!notes.length) { timeline.innerHTML = "<div class="empty">No notes yet. Save your first moment today.</div>"; return; }
+      timeline.innerHTML = `<div class="count">Today · ${notes.length} note(s)</div>` + notes.map(item =>
         `<article class="event"><time>${formatTime(item.created_at)}</time><p>${escapeHtml(item.content)}</p></article>`
-      ).join('');
+      ).join("");
     }
-    document.querySelector('#note-form').addEventListener('submit', async (event) => {
+    document.querySelector("#note-form").addEventListener("submit", async (event) => {
       event.preventDefault();
       const content = note.value.trim(); if (!content) return;
-      const button = document.querySelector('#save'); button.disabled = true;
-      await fetch('/api/notes', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({content})});
-      note.value = ''; length.textContent = '0 / 1000'; button.disabled = false; await loadNotes();
+      const button = document.querySelector("#save"); button.disabled = true;
+      await fetch("/api/notes", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({content})});
+      note.value = ""; length.textContent = "0 / 1000"; button.disabled = false; await loadNotes();
     });
     loadNotes();
   </script>
 </body>
 </html>"""
-
 
 def init_db() -> None:
     with sqlite3.connect(DB_PATH) as db:
@@ -91,7 +88,6 @@ def init_db() -> None:
             )
         """)
 
-
 def notes_for_today() -> list[dict[str, str | int]]:
     today = datetime.now().strftime("%Y-%m-%d")
     with sqlite3.connect(DB_PATH) as db:
@@ -101,7 +97,6 @@ def notes_for_today() -> list[dict[str, str | int]]:
             (f"{today}%",),
         ).fetchall()
     return [dict(row) for row in rows]
-
 
 class Handler(BaseHTTPRequestHandler):
     def send_json(self, payload: object, status: int = 200) -> None:
@@ -150,11 +145,10 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, format: str, *args: object) -> None:
         return
 
-
 if __name__ == "__main__":
     init_db()
     server = ThreadingHTTPServer(("127.0.0.1", 8000), Handler)
-    print("Remevahe｜存真 running at http://127.0.0.1:8000")
+    print("Remevahe running at http://127.0.0.1:8000")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
