@@ -61,7 +61,7 @@ HTML = """<!doctype html>
     async function loadNotes() {
       const response = await fetch("/api/notes");
       const notes = await response.json();
-      if (!notes.length) { timeline.innerHTML = "<div class="empty">No notes yet. Save your first moment today.</div>"; return; }
+      if (!notes.length) { timeline.innerHTML = '<div class="empty">No notes yet. Save your first moment today.</div>'; return; }
       timeline.innerHTML = `<div class="count">Today · ${notes.length} note(s)</div>` + notes.map(item =>
         `<article class="event"><time>${formatTime(item.created_at)}</time><p>${escapeHtml(item.content)}</p></article>`
       ).join("");
