@@ -1,34 +1,34 @@
-# Remevahe｜存真
+# Remevahe
 
-> 存下此刻，留住真实。
+> Capture the moment. Keep what is real.
 
-Remevahe 是一个极简的个人记忆记录原型。第一版只保留一个核心动作：写下此刻，并在当天时间线上回看。
+Remevahe is a minimal prototype for personal memory capture. The first version focuses on one simple action: write down a moment and revisit it on today's timeline.
 
-## 当前版本
+## Current version
 
-- 本地网页界面
-- 文字记录
-- 自动记录时间
-- SQLite 本地持久化
-- Today 时间线
-- `/health` 健康检查接口
+- Local web interface
+- Text notes
+- Automatic timestamps
+- SQLite persistence
+- Today timeline
+- `/health` health-check endpoint
 
-暂不包含 AI、照片、视频、账号、云同步和语义搜索。后续功能将在这个最小闭环稳定后逐步加入。
+AI analysis, photos, video, accounts, cloud sync, and semantic search are intentionally out of scope for this first version. They will be added gradually after the core loop is stable.
 
-## 运行
+## Run locally
 
 ```bash
 python3 app.py
 ```
 
-打开 <http://127.0.0.1:8000>。
+Open <http://127.0.0.1:8000> in your browser.
 
-数据保存在项目目录下的 `remevahe.db`，不会上传到云端。
+Data is stored locally in `remevahe.db` and is not uploaded to the cloud.
 
 ## API
 
 ```text
 GET  /health
 GET  /api/notes
-POST /api/notes  {"content":"今天完成了第一版原型"}
+POST /api/notes  {"content":"Finished the first prototype today"}
 ```
